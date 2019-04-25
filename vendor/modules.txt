@@ -1,0 +1,23 @@
+# github.com/konsorten/go-windows-terminal-sequences v1.0.2
+github.com/konsorten/go-windows-terminal-sequences
+# github.com/mailru/easyjson v0.0.0-20190403194419-1ea4449da983
+github.com/mailru/easyjson
+github.com/mailru/easyjson/jlexer
+github.com/mailru/easyjson/jwriter
+github.com/mailru/easyjson/buffer
+# github.com/sirupsen/logrus v1.4.1
+github.com/sirupsen/logrus
+# github.com/streadway/amqp v0.0.0-20190404075320-75d898a42a94
+github.com/streadway/amqp
+# github.com/studtool/common v0.0.0-20190425112943-548f8a638aea
+github.com/studtool/common/logs
+github.com/studtool/common/config
+github.com/studtool/common/consts
+github.com/studtool/common/errs
+github.com/studtool/common/utils
+# github.com/valyala/bytebufferpool v1.0.0
+github.com/valyala/bytebufferpool
+# github.com/valyala/fasttemplate v1.0.1
+github.com/valyala/fasttemplate
+# golang.org/x/sys v0.0.0-20190425045458-9f0b1ff7b46a
+golang.org/x/sys/unix
