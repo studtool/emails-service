@@ -3,9 +3,11 @@ package messages
 import (
 	"fmt"
 
+	"github.com/mailru/easyjson"
 	"github.com/streadway/amqp"
 
 	"github.com/studtool/common/consts"
+	"github.com/studtool/common/queues"
 	"github.com/studtool/common/utils"
 
 	"github.com/studtool/emails-service/beans"
@@ -60,7 +62,7 @@ func (c *QueueClient) OpenConnection() error {
 	}
 
 	c.regQueue, err = ch.QueueDeclare(
-		config.RegQueueName.Value(),
+		queues.RegistrationEmailsQueueName,
 		false,
 		false,
 		false,
@@ -84,16 +86,16 @@ func (c *QueueClient) CloseConnection() error {
 	return c.conn.Close()
 }
 
-type EmailRenderer func() string
+type MessageHandler func(data []byte)
 
 func (c *QueueClient) Run() error {
-	if err := c.receive(c.regQueue, c.renderRegEmail); err != nil {
+	if err := c.receive(c.regQueue, c.sendRegEmail); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (c *QueueClient) receive(q amqp.Queue, r EmailRenderer) error {
+func (c *QueueClient) receive(q amqp.Queue, handler MessageHandler) error {
 	messages, err := c.ch.Consume(
 		q.Name,
 		consts.EmptyString,
@@ -109,19 +111,32 @@ func (c *QueueClient) receive(q amqp.Queue, r EmailRenderer) error {
 
 	go func() {
 		for d := range messages {
-			c.sendEmail(string(d.Body), r())
+			handler(d.Body)
 		}
 	}()
 
 	return nil
 }
 
+func (c *QueueClient) sendRegEmail(data []byte) {
+	var regEmailData queues.RegistrationEmailData
+	if err := c.parseMessageBody(data, &regEmailData); err != nil {
+		beans.Logger().Error(err)
+	} else {
+		c.sendEmail(regEmailData.Email,
+			c.regTemplate.Render(map[string]interface{}{
+				"token": regEmailData.Token,
+			}),
+		)
+	}
+}
+
+func (c *QueueClient) parseMessageBody(data []byte, v easyjson.Unmarshaler) error {
+	return easyjson.Unmarshal(data, v)
+}
+
 func (c *QueueClient) sendEmail(email string, text string) {
 	if err := c.smtpClient.SendEmail(email, text); err != nil {
 		beans.Logger().Error(err)
 	}
-}
-
-func (c *QueueClient) renderRegEmail() string {
-	return c.regTemplate.Render(map[string]interface{}{})
 }
