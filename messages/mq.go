@@ -14,7 +14,7 @@ import (
 	"github.com/studtool/emails-service/templates"
 )
 
-type MQ struct {
+type QueueClient struct {
 	connStr string
 
 	ch   *amqp.Channel
@@ -26,8 +26,8 @@ type MQ struct {
 	smtpClient *emails.SmtpClient
 }
 
-func NewQueue() *MQ {
-	return &MQ{
+func NewQueueClient() *QueueClient {
+	return &QueueClient{
 		connStr: fmt.Sprintf("amqp://%s:%s@%s:%s/",
 			config.QueueUser.Value(), config.QueuePassword.Value(),
 			config.QueueHost.Value(), config.QueuePort.Value(),
@@ -35,13 +35,13 @@ func NewQueue() *MQ {
 	}
 }
 
-func (mq *MQ) OpenConnection() error {
+func (c *QueueClient) OpenConnection() error {
 	var conn *amqp.Connection
 	err := utils.WithRetry(func(n int) (err error) {
 		if n > 0 {
 			beans.Logger().Info(fmt.Sprintf("opening message queue connection. retry #%d", n))
 		}
-		conn, err = amqp.Dial(mq.connStr)
+		conn, err = amqp.Dial(c.connStr)
 		return err
 	}, config.QueueConnNumRet.Value(), config.QueueConnRetItv.Value())
 	if err != nil {
@@ -53,7 +53,7 @@ func (mq *MQ) OpenConnection() error {
 		return err
 	}
 
-	mq.regQueue, err = ch.QueueDeclare(
+	c.regQueue, err = ch.QueueDeclare(
 		config.RegQueueName.Value(),
 		false,
 		false,
@@ -65,30 +65,30 @@ func (mq *MQ) OpenConnection() error {
 		return err
 	}
 
-	mq.ch = ch
-	mq.conn = conn
+	c.ch = ch
+	c.conn = conn
 
 	return nil
 }
 
-func (mq *MQ) CloseConnection() error {
-	if err := mq.ch.Close(); err != nil {
+func (c *QueueClient) CloseConnection() error {
+	if err := c.ch.Close(); err != nil {
 		return err
 	}
-	return mq.conn.Close()
+	return c.conn.Close()
 }
 
 type EmailRenderer func() string
 
-func (mq *MQ) Run() error {
-	if err := mq.receive(mq.regQueue, mq.renderRegEmail); err != nil {
+func (c *QueueClient) Run() error {
+	if err := c.receive(c.regQueue, c.renderRegEmail); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (mq *MQ) receive(q amqp.Queue, r EmailRenderer) error {
-	messages, err := mq.ch.Consume(
+func (c *QueueClient) receive(q amqp.Queue, r EmailRenderer) error {
+	messages, err := c.ch.Consume(
 		q.Name,
 		consts.EmptyString,
 		true,
@@ -103,19 +103,19 @@ func (mq *MQ) receive(q amqp.Queue, r EmailRenderer) error {
 
 	go func() {
 		for d := range messages {
-			mq.sendEmail(string(d.Body), r())
+			c.sendEmail(string(d.Body), r())
 		}
 	}()
 
 	return nil
 }
 
-func (mq *MQ) sendEmail(email string, text string) {
-	if err := mq.smtpClient.SendEmail(email, text); err != nil {
+func (c *QueueClient) sendEmail(email string, text string) {
+	if err := c.smtpClient.SendEmail(email, text); err != nil {
 		beans.Logger().Error(err)
 	}
 }
 
-func (mq *MQ) renderRegEmail() string {
-	return mq.regTemplate.Render(map[string]interface{}{})
+func (c *QueueClient) renderRegEmail() string {
+	return c.regTemplate.Render(map[string]interface{}{})
 }
