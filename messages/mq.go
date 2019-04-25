@@ -20,18 +20,24 @@ type QueueClient struct {
 	ch   *amqp.Channel
 	conn *amqp.Connection
 
-	regQueue    amqp.Queue
-	regTemplate *templates.RegistrationTemplate
+	regQueue amqp.Queue
 
 	smtpClient *emails.SmtpClient
+
+	regTemplate *templates.RegistrationTemplate
 }
 
-func NewQueueClient() *QueueClient {
+func NewQueueClient(smtp *emails.SmtpClient,
+	regTmp *templates.RegistrationTemplate) *QueueClient {
+
 	return &QueueClient{
 		connStr: fmt.Sprintf("amqp://%s:%s@%s:%s/",
 			config.QueueUser.Value(), config.QueuePassword.Value(),
 			config.QueueHost.Value(), config.QueuePort.Value(),
 		),
+
+		smtpClient:  smtp,
+		regTemplate: regTmp,
 	}
 }
 
