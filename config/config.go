@@ -30,7 +30,5 @@ var (
 	QueueConnNumRet = config.NewIntDefault("STUDTOOL_EMAILS_QUEUE_CONNECTION_NUM_RETRIES", 10)
 	QueueConnRetItv = config.NewTimeSecsDefault("STUDTOOL_EMAILS_QUEUE_CONNECTION_RETRY_INTERVAL", 2*time.Second)
 
-	RegQueueName = config.NewStringDefault("STUDTOOL_REGISTRATION_EMAILS_QUEUE_NAME", "reg_emails_queue")
-
 	RegEmailTemplatePath = config.NewStringDefault("STUDTOOL_REGISTRATION_EMAIL_TEMPLATE_PATH", "./template.txt")
 )

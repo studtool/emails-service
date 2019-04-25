@@ -118,19 +118,6 @@ func (c *QueueClient) receive(q amqp.Queue, handler MessageHandler) error {
 	return nil
 }
 
-func (c *QueueClient) sendRegEmail(data []byte) {
-	var regEmailData queues.RegistrationEmailData
-	if err := c.parseMessageBody(data, &regEmailData); err != nil {
-		beans.Logger().Error(err)
-	} else {
-		c.sendEmail(regEmailData.Email,
-			c.regTemplate.Render(map[string]interface{}{
-				"token": regEmailData.Token,
-			}),
-		)
-	}
-}
-
 func (c *QueueClient) parseMessageBody(data []byte, v easyjson.Unmarshaler) error {
 	return easyjson.Unmarshal(data, v)
 }
