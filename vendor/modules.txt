@@ -1,3 +1,5 @@
+# bou.ke/monkey v1.0.1
+bou.ke/monkey
 # github.com/konsorten/go-windows-terminal-sequences v1.0.2
 github.com/konsorten/go-windows-terminal-sequences
 # github.com/mailru/easyjson v0.0.0-20190403194419-1ea4449da983
@@ -24,5 +26,5 @@ github.com/valyala/fasttemplate
 go.uber.org/dig
 go.uber.org/dig/internal/digreflect
 go.uber.org/dig/internal/dot
-# golang.org/x/sys v0.0.0-20190425145619-16072639606e
+# golang.org/x/sys v0.0.0-20190426135247-a129542de9ae
 golang.org/x/sys/unix

@@ -19,9 +19,13 @@ func main() {
 	c := dig.New()
 
 	utils.AssertOk(c.Provide(templates.NewRegistrationTemplate))
-	utils.AssertOk(c.Provide(emails.NewSmtpClient))
-	utils.AssertOk(c.Provide(messages.NewQueueClient))
+	utils.AssertOk(c.Invoke(func(t *templates.RegistrationTemplate) {
+		if err := t.Load(); err != nil {
+			beans.Logger().Fatal(err)
+		}
+	}))
 
+	utils.AssertOk(c.Provide(messages.NewQueueClient))
 	utils.AssertOk(c.Invoke(func(c *messages.QueueClient) {
 		if err := c.OpenConnection(); err != nil {
 			beans.Logger().Fatal(err)
@@ -39,6 +43,7 @@ func main() {
 	signal.Notify(ch, syscall.SIGTERM)
 	signal.Notify(ch, syscall.SIGINT)
 
+	utils.AssertOk(c.Provide(emails.NewSmtpClient))
 	utils.AssertOk(c.Invoke(func(c *messages.QueueClient) {
 		if err := c.Run(); err != nil {
 			beans.Logger().Fatal(err)
