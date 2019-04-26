@@ -21,6 +21,7 @@ var (
 	SmtpPort     = config.NewStringDefault("STUDTOOL_SMTP_SERVER_PORT", "25")
 	SmtpUser     = config.NewStringDefault("STUDTOOL_SMTP_SERVER_USER", "user")
 	SmtpPassword = config.NewStringDefault("STUDTOOL_SMTP_SERVER_PASSWORD", "password")
+	SmtpSSL      = config.NewFlagDefault("STUDTOOL_SMTP_SERVER_SSL", true)
 
 	QueueHost     = config.NewStringDefault("STUDTOOL_EMAILS_QUEUE_HOST", "127.0.0.1")
 	QueuePort     = config.NewStringDefault("STUDTOOL_EMAILS_QUEUE_PORT", "5672")

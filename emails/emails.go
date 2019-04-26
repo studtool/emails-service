@@ -10,13 +10,23 @@ import (
 	"github.com/studtool/emails-service/config"
 )
 
-type SmtpClient struct{}
-
-func NewSmtpClient() *SmtpClient {
-	return &SmtpClient{}
+type SmtpClient struct {
+	sendFunc SendFunc
 }
 
-func (c *SmtpClient) SendEmail(email, subject, text string) (err error) {
+func NewSmtpClient() *SmtpClient {
+	c := &SmtpClient{}
+	if config.SmtpSSL.Value() {
+		c.sendFunc = c.SendEmailTLS
+	} else {
+		panic("not implemented") //TODO
+	}
+	return c
+}
+
+type SendFunc func(email, subject, text string) error
+
+func (c *SmtpClient) SendEmailTLS(email, subject, text string) (err error) {
 	from := mail.Address{
 		Name:    consts.EmptyString,
 		Address: config.SmtpUser.Value(),
