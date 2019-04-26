@@ -7,6 +7,7 @@ import (
 	"net/smtp"
 
 	"github.com/studtool/common/consts"
+
 	"github.com/studtool/emails-service/config"
 )
 
