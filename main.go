@@ -39,11 +39,12 @@ func main() {
 		}))
 	}()
 
+	utils.AssertOk(c.Provide(emails.NewSmtpClient))
+
 	var ch = make(chan os.Signal)
 	signal.Notify(ch, syscall.SIGTERM)
 	signal.Notify(ch, syscall.SIGINT)
 
-	utils.AssertOk(c.Provide(emails.NewSmtpClient))
 	utils.AssertOk(c.Invoke(func(c *messages.QueueClient) {
 		if err := c.Run(); err != nil {
 			beans.Logger().Fatal(err)
