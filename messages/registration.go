@@ -11,7 +11,8 @@ func (c *QueueClient) sendRegEmail(data []byte) {
 	if err := c.parseMessageBody(data, &regEmailData); err != nil {
 		beans.Logger().Error(err)
 	} else {
-		c.sendEmail(regEmailData.Email,
+		c.sendEmail(
+			regEmailData.Email, "Registration",
 			c.regTemplate.Render(map[string]interface{}{
 				"token": regEmailData.Token,
 			}),

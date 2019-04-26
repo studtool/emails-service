@@ -25,6 +25,15 @@ func main() {
 		}
 	}))
 
+	utils.AssertOk(c.Provide(emails.NewSmtpClient))
+	utils.AssertOk(c.Invoke(func(c *emails.SmtpClient) {
+		if err := c.SendEmail("zinoviev.denis@yandex.ru", "Email", "Message"); err != nil {
+			beans.Logger().Fatal(err)
+		}
+	}))
+
+	return
+
 	utils.AssertOk(c.Provide(messages.NewQueueClient))
 	utils.AssertOk(c.Invoke(func(c *messages.QueueClient) {
 		if err := c.OpenConnection(); err != nil {
@@ -38,8 +47,6 @@ func main() {
 			}
 		}))
 	}()
-
-	utils.AssertOk(c.Provide(emails.NewSmtpClient))
 
 	var ch = make(chan os.Signal)
 	signal.Notify(ch, syscall.SIGTERM)

@@ -122,8 +122,8 @@ func (c *QueueClient) parseMessageBody(data []byte, v easyjson.Unmarshaler) erro
 	return easyjson.Unmarshal(data, v)
 }
 
-func (c *QueueClient) sendEmail(email string, text string) {
-	if err := c.smtpClient.SendEmail(email, text); err != nil {
+func (c *QueueClient) sendEmail(email, subject, text string) {
+	if err := c.smtpClient.SendEmail(email, subject, text); err != nil {
 		beans.Logger().Error(err)
 	}
 }

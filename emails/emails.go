@@ -1,12 +1,12 @@
 package emails
 
 import (
+	"crypto/tls"
 	"fmt"
+	"net/mail"
 	"net/smtp"
 
 	"github.com/studtool/common/consts"
-	"github.com/studtool/common/errs"
-
 	"github.com/studtool/emails-service/config"
 )
 
@@ -16,26 +16,82 @@ func NewSmtpClient() *SmtpClient {
 	return &SmtpClient{}
 }
 
-func (c *SmtpClient) SendEmail(email string, text string) *errs.Error {
+func (c *SmtpClient) SendEmail(email, subject, text string) (err error) {
+	from := mail.Address{
+		Name:    consts.EmptyString,
+		Address: config.SmtpUser.Value(),
+	}
+	to := mail.Address{
+		Name:    consts.EmptyString,
+		Address: email,
+	}
+
+	subj := subject
+	body := text
+
+	headers := make(map[string]string)
+	headers["From"] = from.String()
+	headers["To"] = to.String()
+	headers["Subject"] = subj
+
+	message := consts.EmptyString
+	for k, v := range headers {
+		message += fmt.Sprintf("%s: %s\r\n", k, v)
+	}
+	message += fmt.Sprintf("\r\n%s", body)
+
+	tlsConfig := &tls.Config{
+		InsecureSkipVerify: true,
+		ServerName:         config.SmtpHost.Value(),
+	}
+
+	addr := fmt.Sprintf("%s:%s",
+		config.SmtpHost.Value(), config.SmtpPort.Value())
+
+	var conn *tls.Conn
+	conn, err = tls.Dial("tcp", addr, tlsConfig)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		err = conn.Close()
+	}()
+
+	var client *smtp.Client
+	client, err = smtp.NewClient(conn, config.SmtpHost.Value())
+	if err != nil {
+		return err
+	}
+
 	auth := smtp.PlainAuth(
 		consts.EmptyString,
 		config.SmtpUser.Value(),
 		config.SmtpPassword.Value(),
 		config.SmtpHost.Value(),
 	)
-
-	err := smtp.SendMail(
-		fmt.Sprintf("%s:%s",
-			config.SmtpHost.Value(), config.SmtpPort.Value(),
-		),
-		auth,
-		config.SmtpUser.Value(),
-		[]string{email},
-		[]byte(text),
-	)
-	if err != nil {
-		return errs.New(err)
+	if err = client.Auth(auth); err != nil {
+		return err
 	}
 
-	return nil
+	if err = client.Mail(from.Address); err != nil {
+		return err
+	}
+	if err = client.Rcpt(to.Address); err != nil {
+		return err
+	}
+
+	w, err := client.Data()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		err = w.Close()
+	}()
+
+	_, err = w.Write([]byte(message))
+	if err != nil {
+		return err
+	}
+
+	return client.Quit()
 }
