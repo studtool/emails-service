@@ -3,6 +3,7 @@ package emails
 import (
 	"crypto/tls"
 	"fmt"
+	"github.com/studtool/emails-service/beans"
 	"net/mail"
 	"net/smtp"
 
@@ -28,6 +29,10 @@ func NewSmtpClient() *SmtpClient {
 type SendFunc func(email, subject, text string) error
 
 func (c *SmtpClient) SendEmailTLS(email, subject, text string) (err error) {
+	defer func() {
+		beans.Logger().Info(fmt.Sprintf(`Email to:"%s"; subject: "%s"`, email, subject))
+	}()
+
 	from := mail.Address{
 		Name:    consts.EmptyString,
 		Address: config.SmtpUser.Value(),
