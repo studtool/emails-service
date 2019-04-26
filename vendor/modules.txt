@@ -16,7 +16,6 @@ github.com/studtool/common/utils
 github.com/studtool/common/logs
 github.com/studtool/common/config
 github.com/studtool/common/consts
-github.com/studtool/common/errs
 github.com/studtool/common/queues
 # github.com/valyala/bytebufferpool v1.0.0
 github.com/valyala/bytebufferpool
