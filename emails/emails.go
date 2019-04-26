@@ -3,12 +3,12 @@ package emails
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/studtool/emails-service/beans"
 	"net/mail"
 	"net/smtp"
 
 	"github.com/studtool/common/consts"
 
+	"github.com/studtool/emails-service/beans"
 	"github.com/studtool/emails-service/config"
 )
 
