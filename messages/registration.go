@@ -6,15 +6,15 @@ import (
 	"github.com/studtool/emails-service/beans"
 )
 
-func (c *QueueClient) sendRegEmail(data []byte) {
-	var regEmailData queues.RegistrationEmailData
-	if err := c.parseMessageBody(data, &regEmailData); err != nil {
+func (c *QueueClient) sendRegEmail(body []byte) {
+	data := &queues.RegistrationEmailData{}
+	if err := c.parseMessageBody(body, data); err != nil {
 		beans.Logger().Error(err)
 	} else {
 		c.sendEmail(
-			regEmailData.Email, "Registration",
-			c.regTemplate.Render(map[string]interface{}{
-				"token": regEmailData.Token,
+			data.Email, "Registration",
+			c.regEmailTemplate.Render(map[string]interface{}{
+				"token": data.Token,
 			}),
 		)
 	}

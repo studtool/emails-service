@@ -9,27 +9,27 @@ import (
 )
 
 var (
-	_ = func() *config.FlagVar {
-		f := config.NewFlagDefault("STUDTOOL_EMAILS_SERVICE_SHOULD_LOG_ENV_VARS", false)
+	_ = func() *cconfig.FlagVar {
+		f := cconfig.NewFlagDefault("STUDTOOL_EMAILS_SERVICE_SHOULD_LOG_ENV_VARS", false)
 		if f.Value() {
-			config.SetLogger(beans.Logger())
+			cconfig.SetLogger(beans.Logger())
 		}
 		return f
 	}()
 
-	SmtpHost     = config.NewStringDefault("STUDTOOL_SMTP_SERVER_HOST", "127.0.0.1")
-	SmtpPort     = config.NewStringDefault("STUDTOOL_SMTP_SERVER_PORT", "25")
-	SmtpUser     = config.NewStringDefault("STUDTOOL_SMTP_SERVER_USER", "user")
-	SmtpPassword = config.NewStringDefault("STUDTOOL_SMTP_SERVER_PASSWORD", "password")
-	SmtpSSL      = config.NewFlagDefault("STUDTOOL_SMTP_SERVER_SSL", true)
+	SmtpHost     = cconfig.NewStringDefault("STUDTOOL_SMTP_SERVER_HOST", "127.0.0.1")
+	SmtpPort     = cconfig.NewStringDefault("STUDTOOL_SMTP_SERVER_PORT", "25")
+	SmtpUser     = cconfig.NewStringDefault("STUDTOOL_SMTP_SERVER_USER", "user")
+	SmtpPassword = cconfig.NewStringDefault("STUDTOOL_SMTP_SERVER_PASSWORD", "password")
+	SmtpSSL      = cconfig.NewFlagDefault("STUDTOOL_SMTP_SERVER_SSL", true)
 
-	QueueHost     = config.NewStringDefault("STUDTOOL_EMAILS_QUEUE_HOST", "127.0.0.1")
-	QueuePort     = config.NewStringDefault("STUDTOOL_EMAILS_QUEUE_PORT", "5672")
-	QueueUser     = config.NewStringDefault("STUDTOOL_EMAILS_QUEUE_USER", "user")
-	QueuePassword = config.NewStringDefault("STUDTOOL_EMAILS_QUEUE_PASSWORD", "password")
+	QueueHost     = cconfig.NewStringDefault("STUDTOOL_EMAILS_QUEUE_HOST", "127.0.0.1")
+	QueuePort     = cconfig.NewStringDefault("STUDTOOL_EMAILS_QUEUE_PORT", "5672")
+	QueueUser     = cconfig.NewStringDefault("STUDTOOL_EMAILS_QUEUE_USER", "user")
+	QueuePassword = cconfig.NewStringDefault("STUDTOOL_EMAILS_QUEUE_PASSWORD", "password")
 
-	QueueConnNumRet = config.NewIntDefault("STUDTOOL_EMAILS_QUEUE_CONNECTION_NUM_RETRIES", 10)
-	QueueConnRetItv = config.NewTimeSecsDefault("STUDTOOL_EMAILS_QUEUE_CONNECTION_RETRY_INTERVAL", 2*time.Second)
+	QueueConnNumRet = cconfig.NewIntDefault("STUDTOOL_EMAILS_QUEUE_CONNECTION_NUM_RETRIES", 10)
+	QueueConnRetItv = cconfig.NewTimeSecsDefault("STUDTOOL_EMAILS_QUEUE_CONNECTION_RETRY_INTERVAL", 2*time.Second)
 
-	RegEmailTemplatePath = config.NewStringDefault("STUDTOOL_REGISTRATION_EMAIL_TEMPLATE_PATH", "./template.txt")
+	RegEmailTemplatePath = cconfig.NewStringDefault("STUDTOOL_REGISTRATION_EMAIL_TEMPLATE_PATH", "./template.txt")
 )

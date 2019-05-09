@@ -16,30 +16,31 @@ import (
 	"github.com/studtool/emails-service/templates"
 )
 
+type ClientParams struct {
+	SmtpClient       *emails.SmtpClient
+	RegEmailTemplate *templates.RegistrationTemplate
+}
+
 type QueueClient struct {
-	connStr string
+	connStr    string
+	connection *amqp.Connection
 
-	ch   *amqp.Channel
-	conn *amqp.Connection
-
-	regQueue amqp.Queue
+	channel *amqp.Channel
 
 	smtpClient *emails.SmtpClient
 
-	regTemplate *templates.RegistrationTemplate
+	regEmailsQueue   amqp.Queue
+	regEmailTemplate *templates.RegistrationTemplate
 }
 
-func NewQueueClient(smtp *emails.SmtpClient,
-	regTmp *templates.RegistrationTemplate) *QueueClient {
-
+func NewQueueClient(params *ClientParams) *QueueClient {
 	return &QueueClient{
 		connStr: fmt.Sprintf("amqp://%s:%s@%s:%s/",
 			config.QueueUser.Value(), config.QueuePassword.Value(),
 			config.QueueHost.Value(), config.QueuePort.Value(),
 		),
-
-		smtpClient:  smtp,
-		regTemplate: regTmp,
+		smtpClient:       params.SmtpClient,
+		regEmailTemplate: params.RegEmailTemplate,
 	}
 }
 
@@ -61,7 +62,7 @@ func (c *QueueClient) OpenConnection() error {
 		return err
 	}
 
-	c.regQueue, err = ch.QueueDeclare(
+	c.regEmailsQueue, err = ch.QueueDeclare(
 		queues.RegistrationEmailsQueueName,
 		false,
 		false,
@@ -73,31 +74,31 @@ func (c *QueueClient) OpenConnection() error {
 		return err
 	}
 
-	c.ch = ch
-	c.conn = conn
+	c.channel = ch
+	c.connection = conn
 
 	return nil
 }
 
 func (c *QueueClient) CloseConnection() error {
-	if err := c.ch.Close(); err != nil {
+	if err := c.channel.Close(); err != nil {
 		return err
 	}
-	return c.conn.Close()
+	return c.connection.Close()
 }
 
 type MessageHandler func(data []byte)
 
 func (c *QueueClient) Run() error {
-	if err := c.receive(c.regQueue, c.sendRegEmail); err != nil {
+	if err := c.receiveRegEmailMessages(); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (c *QueueClient) receive(q amqp.Queue, handler MessageHandler) error {
-	messages, err := c.ch.Consume(
-		q.Name,
+func (c *QueueClient) receiveRegEmailMessages() error {
+	messages, err := c.channel.Consume(
+		c.regEmailsQueue.Name,
 		consts.EmptyString,
 		true,
 		false,
@@ -111,7 +112,7 @@ func (c *QueueClient) receive(q amqp.Queue, handler MessageHandler) error {
 
 	go func() {
 		for d := range messages {
-			handler(d.Body)
+			c.sendRegEmail(d.Body)
 		}
 	}()
 
@@ -126,4 +127,8 @@ func (c *QueueClient) sendEmail(email, subject, text string) {
 	if err := c.smtpClient.SendEmail(email, subject, text); err != nil {
 		beans.Logger().Error(err)
 	}
+}
+
+func (c *QueueClient) handleErr(err error) {
+	beans.Logger().Error(err)
 }
