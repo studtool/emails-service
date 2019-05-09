@@ -27,7 +27,7 @@ func parseString(name string, defVal string, isRequired bool) *StringVar {
 	v := os.Getenv(name)
 	if v == consts.EmptyString {
 		if isRequired {
-			panic(fmt.Sprintf("config: %s is required", name))
+			panicNotSet(name)
 		} else {
 			v = defVal
 		}

@@ -17,7 +17,7 @@ var (
 	_ easyjson.Marshaler
 )
 
-func easyjsonCec9433bDecodeGithubComStudtoolCommonQueues(in *jlexer.Lexer, out *RegistrationEmailData) {
+func easyjson354d66fbDecodeGithubComStudtoolCommonQueues(in *jlexer.Lexer, out *RegistrationEmailData) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -50,7 +50,7 @@ func easyjsonCec9433bDecodeGithubComStudtoolCommonQueues(in *jlexer.Lexer, out *
 		in.Consumed()
 	}
 }
-func easyjsonCec9433bEncodeGithubComStudtoolCommonQueues(out *jwriter.Writer, in RegistrationEmailData) {
+func easyjson354d66fbEncodeGithubComStudtoolCommonQueues(out *jwriter.Writer, in RegistrationEmailData) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -80,23 +80,23 @@ func easyjsonCec9433bEncodeGithubComStudtoolCommonQueues(out *jwriter.Writer, in
 // MarshalJSON supports json.Marshaler interface
 func (v RegistrationEmailData) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonCec9433bEncodeGithubComStudtoolCommonQueues(&w, v)
+	easyjson354d66fbEncodeGithubComStudtoolCommonQueues(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v RegistrationEmailData) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonCec9433bEncodeGithubComStudtoolCommonQueues(w, v)
+	easyjson354d66fbEncodeGithubComStudtoolCommonQueues(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *RegistrationEmailData) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonCec9433bDecodeGithubComStudtoolCommonQueues(&r, v)
+	easyjson354d66fbDecodeGithubComStudtoolCommonQueues(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *RegistrationEmailData) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonCec9433bDecodeGithubComStudtoolCommonQueues(l, v)
+	easyjson354d66fbDecodeGithubComStudtoolCommonQueues(l, v)
 }

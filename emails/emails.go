@@ -3,6 +3,8 @@ package emails
 import (
 	"crypto/tls"
 	"fmt"
+	"io"
+	"log"
 	"net/mail"
 	"net/smtp"
 
@@ -19,16 +21,73 @@ type SmtpClient struct {
 func NewSmtpClient() *SmtpClient {
 	c := &SmtpClient{}
 	if config.SmtpSSL.Value() {
-		c.sendFunc = c.SendEmailTLS
+		c.sendFunc = c.sendEmailTLS
 	} else {
-		panic("not implemented") //TODO
+		c.sendFunc = c.sendEmail
 	}
 	return c
 }
 
 type SendFunc func(email, subject, text string) error
 
-func (c *SmtpClient) SendEmailTLS(email, subject, text string) (err error) {
+func (c *SmtpClient) SendEmail(email, subject, text string) (err error) {
+	return c.sendFunc(email, subject, text)
+}
+
+func (c *SmtpClient) sendEmail(email, subject, text string) (err error) {
+	host := config.SmtpHost.Value()
+	port := config.SmtpPort.Value()
+	user := config.SmtpUser.Value()
+
+	addr := fmt.Sprintf("%s:%s", host, port)
+
+	var cl *smtp.Client
+	cl, err = smtp.Dial(addr)
+	if err != nil {
+		return
+	}
+	defer func() {
+		err = cl.Close()
+	}()
+
+	from := fmt.Sprintf("%s@%s", user, host)
+	if err = cl.Mail(from); err != nil {
+		return
+	}
+	if err = cl.Rcpt(email); err != nil {
+		log.Fatal(err)
+	}
+
+	var wr io.WriteCloser
+	wr, err = cl.Data()
+	if err != nil {
+		return
+	}
+	defer func() {
+		err = wr.Close()
+	}()
+
+	_, err = fmt.Fprintf(wr, text)
+	if err != nil {
+		return
+	}
+	err = wr.Close()
+
+	if err != nil {
+
+		log.Fatal(err)
+
+	}
+
+	err = cl.Quit()
+	if err != nil {
+		return
+	}
+
+	return nil
+}
+
+func (c *SmtpClient) sendEmailTLS(email, subject, text string) (err error) {
 	defer func() {
 		beans.Logger().Info(fmt.Sprintf(`Email to:"%s"; subject: "%s"`, email, subject))
 	}()
