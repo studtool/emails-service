@@ -5,6 +5,7 @@ import (
 
 	"github.com/mailru/easyjson"
 	"github.com/streadway/amqp"
+	"go.uber.org/dig"
 
 	"github.com/studtool/common/consts"
 	"github.com/studtool/common/queues"
@@ -15,11 +16,6 @@ import (
 	"github.com/studtool/emails-service/emails"
 	"github.com/studtool/emails-service/templates"
 )
-
-type ClientParams struct {
-	SmtpClient       *emails.SmtpClient
-	RegEmailTemplate *templates.RegistrationTemplate
-}
 
 type QueueClient struct {
 	connStr    string
@@ -33,7 +29,14 @@ type QueueClient struct {
 	regEmailTemplate *templates.RegistrationTemplate
 }
 
-func NewQueueClient(params *ClientParams) *QueueClient {
+type ClientParams struct {
+	dig.In
+
+	SmtpClient       *emails.SmtpClient
+	RegEmailTemplate *templates.RegistrationTemplate
+}
+
+func NewQueueClient(params ClientParams) *QueueClient {
 	return &QueueClient{
 		connStr: fmt.Sprintf("amqp://%s:%s@%s:%s/",
 			config.MqUser.Value(), config.MqPassword.Value(),
