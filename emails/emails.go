@@ -3,8 +3,7 @@ package emails
 import (
 	"crypto/tls"
 	"fmt"
-	"io"
-	"log"
+	"net"
 	"net/mail"
 	"net/smtp"
 
@@ -35,56 +34,82 @@ func (c *SmtpClient) SendEmail(email, subject, text string) (err error) {
 }
 
 func (c *SmtpClient) sendEmail(email, subject, text string) (err error) {
-	host := config.SmtpHost.Value()
-	port := config.SmtpPort.Value()
-	user := config.SmtpUser.Value()
-
-	addr := fmt.Sprintf("%s:%s", host, port)
-
-	var cl *smtp.Client
-	cl, err = smtp.Dial(addr)
-	if err != nil {
-		return
-	}
 	defer func() {
-		err = cl.Close()
+		beans.Logger().Info(fmt.Sprintf(`Email to:"%s"; subject: "%s"`, email, subject))
 	}()
 
-	from := fmt.Sprintf("%s@%s", user, host)
-	if err = cl.Mail(from); err != nil {
-		return
+	from := mail.Address{
+		Name:    consts.EmptyString,
+		Address: config.SmtpUser.Value(),
 	}
-	if err = cl.Rcpt(email); err != nil {
-		log.Fatal(err)
+	to := mail.Address{
+		Name:    consts.EmptyString,
+		Address: email,
 	}
 
-	var wr io.WriteCloser
-	wr, err = cl.Data()
+	subj := subject
+	body := text
+
+	headers := make(map[string]string)
+	headers["From"] = from.String()
+	headers["To"] = to.String()
+	headers["Subject"] = subj
+
+	message := consts.EmptyString
+	for k, v := range headers {
+		message += fmt.Sprintf("%s: %s\r\n", k, v)
+	}
+	message += fmt.Sprintf("\r\n%s", body)
+
+	addr := fmt.Sprintf("%s:%s",
+		config.SmtpHost.Value(), config.SmtpPort.Value())
+
+	var conn net.Conn
+	conn, err = net.Dial("tcp", addr)
 	if err != nil {
-		return
+		return err
 	}
 	defer func() {
-		err = wr.Close()
+		err = conn.Close()
 	}()
 
-	_, err = fmt.Fprintf(wr, text)
+	var client *smtp.Client
+	client, err = smtp.NewClient(conn, config.SmtpHost.Value())
 	if err != nil {
-		return
-	}
-	err = wr.Close()
-
-	if err != nil {
-
-		log.Fatal(err)
-
+		return err
 	}
 
-	err = cl.Quit()
-	if err != nil {
-		return
+	auth := smtp.PlainAuth(
+		consts.EmptyString,
+		config.SmtpUser.Value(),
+		config.SmtpPassword.Value(),
+		config.SmtpHost.Value(),
+	)
+	if err = client.Auth(auth); err != nil {
+		return err
 	}
 
-	return nil
+	if err = client.Mail(from.Address); err != nil {
+		return err
+	}
+	if err = client.Rcpt(to.Address); err != nil {
+		return err
+	}
+
+	w, err := client.Data()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		err = w.Close()
+	}()
+
+	_, err = w.Write([]byte(message))
+	if err != nil {
+		return err
+	}
+
+	return client.Quit()
 }
 
 func (c *SmtpClient) sendEmailTLS(email, subject, text string) (err error) {
