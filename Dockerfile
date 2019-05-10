@@ -3,9 +3,7 @@ WORKDIR /tmp/emails-service
 COPY . .
 RUN go build -mod vendor -o /tmp/service .
 
-FROM ubuntu:18.04
-RUN apt-get update \
-    && apt-get install -y postfix
+FROM alpine:3.9
 WORKDIR /tmp
 COPY --from=base /tmp/service ./service
 ENTRYPOINT ["./service"]
