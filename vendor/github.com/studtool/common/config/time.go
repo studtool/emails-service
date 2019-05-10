@@ -9,23 +9,23 @@ import (
 	"github.com/studtool/common/consts"
 )
 
-type TimeSecsVar struct {
+type TimeVar struct {
 	value time.Duration
 }
 
-func NewTimeSecs(name string) *TimeSecsVar {
+func NewTime(name string) *TimeVar {
 	return parseTimeSecs(name, consts.AnyTime, true)
 }
 
-func NewTimeSecsDefault(name string, defVal time.Duration) *TimeSecsVar {
+func NewTimeDefault(name string, defVal time.Duration) *TimeVar {
 	return parseTimeSecs(name, defVal, false)
 }
 
-func (v *TimeSecsVar) Value() time.Duration {
+func (v *TimeVar) Value() time.Duration {
 	return v.value
 }
 
-func parseTimeSecs(name string, defVal time.Duration, isRequired bool) *TimeSecsVar {
+func parseTimeSecs(name string, defVal time.Duration, isRequired bool) *TimeVar {
 	var t time.Duration
 
 	v := os.Getenv(name)
@@ -36,25 +36,32 @@ func parseTimeSecs(name string, defVal time.Duration, isRequired bool) *TimeSecs
 			t = defVal
 		}
 	} else {
-		if v[len(v)-1] == 's' {
-			v = v[:len(v)-1]
+		m := v[len(v)-1]
 
-			tVal, err := strconv.Atoi(v)
-			if err != nil {
-				panic(err)
-			}
-
-			t = time.Duration(tVal) * time.Second
-		} else {
+		switch m {
+		case 's':
+			t = time.Second
+		case 'm':
+			t = time.Minute
+		case 'h':
+			t = time.Hour
+		default:
 			panicInvalidFormat(name, "[INTEGER]s")
 		}
+
+		tVal, err := strconv.Atoi(v[:len(v)-1])
+		if err != nil {
+			panic(err)
+		}
+
+		t *= time.Duration(tVal)
 	}
 
 	if logger != nil {
 		logger.Info(fmt.Sprintf("%s=%v", name, t))
 	}
 
-	return &TimeSecsVar{
+	return &TimeVar{
 		value: t,
 	}
 }

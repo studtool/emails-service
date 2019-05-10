@@ -29,7 +29,7 @@ var (
 	MqPassword = cconfig.NewStringDefault("STUDTOOL_MQ_PASSWORD", "password")
 
 	MqConnNumRet = cconfig.NewIntDefault("STUDTOOL_MQ_CONNECTION_NUM_RETRIES", 10)
-	MqConnRetItv = cconfig.NewTimeSecsDefault("STUDTOOL_MQ_CONNECTION_RETRY_INTERVAL", 2*time.Second)
+	MqConnRetItv = cconfig.NewTimeDefault("STUDTOOL_MQ_CONNECTION_RETRY_INTERVAL", 2*time.Second)
 
 	RegEmailTemplatePath = cconfig.NewStringDefault("STUDTOOL_REGISTRATION_EMAIL_TEMPLATE_PATH", "./template.txt")
 )

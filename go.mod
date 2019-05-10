@@ -8,7 +8,7 @@ require (
 	bou.ke/monkey v1.0.1
 	github.com/mailru/easyjson v0.0.0-20190403194419-1ea4449da983
 	github.com/streadway/amqp v0.0.0-20190404075320-75d898a42a94
-	github.com/studtool/common v0.0.0-20190509160854-602fdc361fdd
+	github.com/studtool/common v0.0.0-20190510133904-920cc33d483e
 	github.com/valyala/fasttemplate v1.0.1
 	go.uber.org/dig v1.7.1-0.20190327003609-4cc9f8898fe3
 )
