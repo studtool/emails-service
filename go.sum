@@ -19,8 +19,8 @@ github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 github.com/stretchr/testify v1.3.0 h1:TivCn/peBQ7UY8ooIcPgZFpTNSz0Q2U6UrFlUfqbe0Q=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
-github.com/studtool/common v0.0.0-20190518195043-e1b27f5c60c5 h1:aLjqVXafKKShU4kMxA7aXW2qrCvhjjVrFefGO3bpCQg=
-github.com/studtool/common v0.0.0-20190518195043-e1b27f5c60c5/go.mod h1:0eWj8F/Dutc6I4153ywsOSZ/kLbMo1os/aupUz+op6w=
+github.com/studtool/common v0.0.0-20190518220330-3a0ba4eb3aa3 h1:nXe+pCV8gNTf+oboOp2EKG/bFWqf02BRxquA9eF704g=
+github.com/studtool/common v0.0.0-20190518220330-3a0ba4eb3aa3/go.mod h1:0eWj8F/Dutc6I4153ywsOSZ/kLbMo1os/aupUz+op6w=
 github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6KllzawFIhcdPw=
 github.com/valyala/bytebufferpool v1.0.0/go.mod h1:6bBcMArwyJ5K/AmCkWv1jt77kVWyCJ6HpOuEn7z0Csc=
 github.com/valyala/fasttemplate v1.0.1 h1:tY9CJiPnMXf1ERmG2EyK7gNUd+c6RKGD0IfU8WdUSz8=
