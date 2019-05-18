@@ -47,8 +47,11 @@ const (
 )
 
 var (
+	//nolint:gochecknoglobals
 	host = getHostname()
-	pid  = int64(os.Getpid())
+
+	//nolint:gochecknoglobals
+	pid = int64(os.Getpid())
 )
 
 func (log *Logger) callerInfo() logrus.Fields {
